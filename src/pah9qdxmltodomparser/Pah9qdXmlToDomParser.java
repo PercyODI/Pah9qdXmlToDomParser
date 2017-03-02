@@ -19,9 +19,9 @@ public class Pah9qdXmlToDomParser extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("FileChooseFXML.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("ParseView.fxml"));
         Parent root = loader.load();
-        FileChooseFXMLController controller = loader.getController();
+        ParseViewController controller = loader.getController();
         
         //Parent root = FXMLLoader.load(getClass().getResource("Grid.fxml"));
         
