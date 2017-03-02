@@ -24,7 +24,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <TextArea fx:id="helpText" editable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefRowCount="2" text="Please select an XML file to begin.&#10;To open an XML file, click File -&gt; Open XML File" wrapText="true" VBox.vgrow="NEVER" />
+      <TextArea fx:id="helpText" editable="false" focusTraversable="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefRowCount="4" prefWidth="446.0" text="Please select an XML file to begin.&#10;To open an XML file, click File -&gt; Open XML File&#10;To see a demo, click File -&gt; Stream demo XML&#10;" wrapText="true" VBox.vgrow="NEVER" />
       <SplitPane dividerPositions="0.5" orientation="VERTICAL" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
         <items>
             <TreeView fx:id="treeView" prefHeight="200.0" prefWidth="200.0" />

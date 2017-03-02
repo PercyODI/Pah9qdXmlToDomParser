@@ -97,9 +97,9 @@ public class ParseViewController implements Initializable {
                 if (newValue.getValue().attributes.isEmpty()) {
                     attributes.add("--No Attributes For Selected Item--");
                 } else {
-                    for (Map.Entry<String, String> attribute : newValue.getValue().attributes.entrySet()) {
-                        attributes.add(attribute.getKey() + " => " + attribute.getValue());
-                    }
+                    newValue.getValue().attributes.entrySet().forEach((attribute) -> {
+                        attributes.add(attribute.getKey() + " : " + attribute.getValue());
+                    });
                 }
 
                 String contents = newValue.getValue().content;
@@ -160,12 +160,6 @@ public class ParseViewController implements Initializable {
         } catch (Exception ex) {
             displayExceptionAlert(ex);
         }
-
-//        boolean hasChildren = true;
-//        while(hasChildren) {
-//            
-//        }
-        return;
     }
 
     private void addTreeItem(XmlNode parentNode, TreeItem parentItem) {
@@ -173,15 +167,15 @@ public class ParseViewController implements Initializable {
             return;
         }
 
-        for (Map.Entry<String, ArrayList<XmlNode>> listOfChildren : parentNode.children.entrySet()) {
-            for (XmlNode child : listOfChildren.getValue()) {
+        parentNode.children.entrySet().forEach((listOfChildren) -> {
+            listOfChildren.getValue().stream().map((child) -> {
                 TreeItem<XmlNode> treeItem = new TreeItem<>(child);    //Create a new node
                 addTreeItem(child, treeItem);                          //Add all of its children to item
+                return treeItem;
+            }).forEachOrdered((treeItem) -> {
                 parentItem.getChildren().add(treeItem);                //Add this to its parent
-            }
-        }
-
-        return;
+            });
+        });
     }
 
     public void displayExceptionAlert(Exception ex) {
