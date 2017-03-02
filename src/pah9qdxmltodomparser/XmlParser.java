@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.atteo.evo.inflector.English;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -31,7 +32,7 @@ public class XmlParser {
             SAXParser saxParser = factory.newSAXParser();
 
             DefaultHandler handler = new DefaultHandler() {
-                
+
                 XmlNode currentNode = null;
                 Stack<XmlNode> stack = new Stack<>();
 
@@ -40,20 +41,19 @@ public class XmlParser {
                     XmlNode node = new XmlNode();
                     node.name = qName;
                     int attributeCount = attributes.getLength();
-                    if (attributeCount > 0){
-                        for(int i = 0; i < attributeCount; i++) {
+                    if (attributeCount > 0) {
+                        for (int i = 0; i < attributeCount; i++) {
                             node.attributes.put(attributes.getQName(i), attributes.getValue(i));
                         }
                     }
-                    
+
                     stack.add(node);
-                    if(currentNode != null) {
-                        if (currentNode.children.containsKey(node.name)) {
-                            currentNode.children.get(node.name).add(node);
-                        } else {
-                            currentNode.children.put(node.name, new ArrayList<>());
-                            currentNode.children.get(node.name).add(node);
+                    if (currentNode != null) {
+                        String pluralNodeName = English.plural(node.name);
+                        if (!currentNode.children.containsKey(pluralNodeName)) {
+                            currentNode.children.put(pluralNodeName, new ArrayList<>());
                         }
+                        currentNode.children.get(pluralNodeName).add(node);
                     }
                     currentNode = node;
                 }
@@ -62,7 +62,7 @@ public class XmlParser {
                 public void endElement(String uri, String localName, String qName) throws SAXException {
                     XmlNode poppedNode = stack.pop();
                     poppedNode.content = poppedNode.content.trim();
-                    if(stack.empty()) {
+                    if (stack.empty()) {
                         root.add(poppedNode);
                         currentNode = null;
                     } else {
@@ -72,7 +72,7 @@ public class XmlParser {
 
                 @Override
                 public void characters(char[] ch, int start, int length) throws SAXException {
-                    if(currentNode != null) {
+                    if (currentNode != null) {
                         currentNode.content += StringEscapeUtils.unescapeHtml4(new String(ch, start, length));
                     }
                 }
