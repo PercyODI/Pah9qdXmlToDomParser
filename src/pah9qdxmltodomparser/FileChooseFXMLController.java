@@ -106,6 +106,7 @@ public class FileChooseFXMLController implements Initializable {
     
     private void fillTreeView(XmlNode rootNode) {
         TreeItem<XmlNode> rootItem = new TreeItem<>(rootNode);
+        rootItem.expandedProperty().set(true);
         treeView.setRoot(rootItem);
         try {
             addTreeItem(rootNode, rootItem);
