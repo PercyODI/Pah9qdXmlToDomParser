@@ -7,15 +7,14 @@ package pah9qdxmltodomparser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Stack;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import org.apache.commons.lang3.StringEscapeUtils;
-import org.atteo.evo.inflector.English;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -25,8 +24,8 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class XmlParser {
 
-    public static void parse(File xmlFile) throws Exception {
-        ArrayList<XmlNode> root = new ArrayList<>();
+    public static XmlNode parse(File xmlFile) throws Exception {
+        XmlNode root = new XmlNode();
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
@@ -35,6 +34,12 @@ public class XmlParser {
 
                 XmlNode currentNode = null;
                 Stack<XmlNode> stack = new Stack<>();
+
+                // This is used to ignore searching for a DTD file.
+                @Override
+                public InputSource resolveEntity(String publicId, String systemId) throws IOException, SAXException {
+                    return new InputSource(new StringReader(""));
+                }
 
                 @Override
                 public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -49,11 +54,10 @@ public class XmlParser {
 
                     stack.add(node);
                     if (currentNode != null) {
-                        String pluralNodeName = English.plural(node.name);
-                        if (!currentNode.children.containsKey(pluralNodeName)) {
-                            currentNode.children.put(pluralNodeName, new ArrayList<>());
+                        if (!currentNode.children.containsKey(node.name)) {
+                            currentNode.children.put(node.name, new ArrayList<>());
                         }
-                        currentNode.children.get(pluralNodeName).add(node);
+                        currentNode.children.get(node.name).add(node);
                     }
                     currentNode = node;
                 }
@@ -63,7 +67,10 @@ public class XmlParser {
                     XmlNode poppedNode = stack.pop();
                     poppedNode.content = poppedNode.content.trim();
                     if (stack.empty()) {
-                        root.add(poppedNode);
+                        root.attributes = poppedNode.attributes;
+                        root.children = poppedNode.children;
+                        root.content = poppedNode.content;
+                        root.name = poppedNode.name;
                         currentNode = null;
                     } else {
                         currentNode = stack.peek();
@@ -73,17 +80,17 @@ public class XmlParser {
                 @Override
                 public void characters(char[] ch, int start, int length) throws SAXException {
                     if (currentNode != null) {
-                        currentNode.content += StringEscapeUtils.unescapeHtml4(new String(ch, start, length));
+                        currentNode.content += new String(ch, start, length);
                     }
                 }
             };
 
             saxParser.parse(xmlFile.getAbsoluteFile(), handler);
-            System.out.println(root.get(0).name);
+            
         } catch (Exception ex) {
             throw ex;
         }
 //        System.out.println(xml);
-        return;
+        return root;
     }
 }

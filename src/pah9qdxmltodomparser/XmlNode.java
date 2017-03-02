@@ -22,4 +22,9 @@ public class XmlNode {
             children = new HashMap<>();
             attributes = new HashMap<>();
         }
+        
+        @Override
+        public String toString() {
+            return this.name;
+        }
     }
